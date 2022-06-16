@@ -1,0 +1,64 @@
+version: '2'
+
+services:
+  rabbitmq:
+    container_name: go_rabbitmq
+    hostname: rabbitmq
+    restart: always
+    image: rabbitmq:3
+    ports:
+      - "8080:15672"
+      - "5672:5672"
+    networks:
+      - go-net
+  postgres:
+    container_name: go_postgres
+    restart: always
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: 123456
+    networks:
+      - go-net
+  redis:
+    container_name: go_redis
+    restart: always
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - go-net
+  go-seed:
+    depends_on:
+      - rabbitmq
+      - postgres
+      - redis
+    container_name: go-seed
+    restart: always
+    image: oswin/jinwei-go-seed:dev
+    ports:
+      - "80:8000"
+    environment:
+      SERVER_HOST: localhost
+      SERVER_PORT: 8000
+      SERVER_RUN_MODE: debug
+      DB_HOST: go_postgres
+      DB_USER: test
+      DB_PASSWORD: 123456
+      DB_PORT: 5432
+      DB_TYPE: postgres
+      DB_NAME: test
+      REDIS_HOST: go_redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD:
+      RABBITMQ_HOST: go_rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+    networks:
+      - go-net
+networks:
+  go-net:
+    driver: bridge
