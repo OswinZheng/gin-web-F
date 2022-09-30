@@ -1,0 +1,14 @@
+name: Build dev in dev machine
+
+on:
+  push:
+    branches:
+      - main
+
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every time
+        run: echo "This step will always run"
